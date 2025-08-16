@@ -16,3 +16,12 @@ export async function handleGenerateNewShortURL(req, res) {
 
   return res.json({ id: shortID });
 }
+
+export async function handleGetAnalytics(req, res) {
+  const shortId = req.params.shortId;
+  const result = await URL.findOne({ shortId });
+  return res.json({
+    totalClicks: result.visitHistory.length,
+    analytics: result.visitHistory,
+  });
+}
