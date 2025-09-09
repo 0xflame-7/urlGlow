@@ -1,0 +1,32 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: url-mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: url-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - 5000:5000
+      - 9229:9229 # For debugging
+    volumes:
+      # - ./backend:/usr/src/app
+      - /usr/src/app/.pnpm-store
+      - /usr/src/app/node_modules
+    environment:
+      - PORT=5000
+      - MONGO_URL=mongodb://mongo:27017/urlGlow
+    command: pnpm dev
+
+volumes:
+  mongo_data:
