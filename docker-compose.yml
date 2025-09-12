@@ -7,6 +7,7 @@ services:
       - 27017:27017
     volumes:
       - mongo_data:/data/db
+    command: mongod --quiet --logpath /dev/null 
 
   backend:
     build:
@@ -32,12 +33,6 @@ services:
           action: rebuild
         - path: ./backend/pnpm-lock.yaml
           action: rebuild
-        - path: ./backend
-          target: /usr/src/app
-          action: sync
-          ignore:
-            - node_modules/
-            - .pnpm-store/
 
 volumes:
   mongo_data:
