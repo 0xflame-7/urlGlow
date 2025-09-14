@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const {
   BadRequestError,
@@ -36,16 +37,20 @@ async function loginUser({ email, password }) {
 
   const user = await getUserByEmail(email);
   if (!user) {
-    throw new UnauthorizedError("Invalid email or password");
+    throw new UnauthorizedError("Invalid credentials");
   }
 
   const isMatch = await bcrypt.compare(password, user.hashPassword);
   if (!isMatch) {
-    throw new UnauthorizedError("Invalid email or password");
+    throw new UnauthorizedError("Invalid credentials");
   }
 
-  // 🚨 In real apps, generate JWT or session here
-  return user;
+  // ✅ JWT creation
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+
+  return { user, token };
 }
 
 module.exports = {
