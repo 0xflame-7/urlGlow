@@ -1,6 +1,7 @@
 {
-  "watch": ["src"],
+  "watch": ["src", "./app.js"],
   "ext": "js,json",
   "ignore": ["node_modules", ".pnpm-store"],
-  "exec": "node ./app.js"
+  "exec": "node ./app.js",
+  "legacyWatch": true
 }

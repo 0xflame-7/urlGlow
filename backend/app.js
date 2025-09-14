@@ -25,6 +25,8 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/auth", require("./src/routes/userRoutes"));
+
 app.listen(process.env.PORT, "0.0.0.0", async () => {
   await connect();
   logger.info(`Server running on port ${process.env.PORT}`);

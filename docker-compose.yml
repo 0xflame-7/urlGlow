@@ -34,6 +34,9 @@ services:
           action: rebuild
         - path: ./backend/pnpm-lock.yaml
           action: rebuild
+        - path: ./backend/Dockerfile
+          action: rebuild
+
 
 volumes:
   mongo_data:
