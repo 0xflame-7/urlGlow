@@ -1,8 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const logger = require("./src/config/logger");
-const connect = require("./src/config/connect");
 const cookieParser = require("cookie-parser");
+const { errorHandler } = require("./src/middleware/errorHandler");
 
 // Create express app
 const app = express();
@@ -29,7 +29,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", require("./src/routes/userRoutes"));
 
-app.listen(process.env.PORT, "0.0.0.0", async () => {
-  await connect();
-  logger.info(`Server running on port ${process.env.PORT}`);
-});
+app.use(errorHandler);
+
+module.exports = app;

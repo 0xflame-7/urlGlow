@@ -65,10 +65,6 @@ async function refreshAccessToken(refreshToken) {
   const payload = verifyRefreshToken(refreshToken);
   const user = await getRefreshTokenById(payload.userId);
 
-  console.group("Refresh Access Token");
-  console.log("User:", user);
-  console.log("Payload:", payload);
-
   if (!user || user.refreshToken !== refreshToken) {
     throw new UnauthorizedError("Invalid refresh token");
   }
