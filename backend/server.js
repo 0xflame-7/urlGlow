@@ -1,12 +1,13 @@
-const logger = require("./src/config/logger");
 const connect = require("./src/config/connect");
 const app = require("./app");
+const logger = require("./src/utils/logger");
+const PORT = require("./src/config/core").PORT;
 
 async function startServer() {
   try {
     await connect();
-    const server = app.listen(5000, "0.0.0.0", () => {
-      // logger.info(`Server started on port ${PORT}`);
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      logger.info(`Server started on port ${PORT}`);
     });
 
     process.on("SIGINT", () => shutdown(server));

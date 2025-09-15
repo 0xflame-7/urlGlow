@@ -8,13 +8,10 @@ const logFormat = printf(({ level, message, timestamp }) => {
 
 const logger = createLogger({
   level: "info", // default level
-  format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    logFormat
-  ),
+  format: combine(timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), logFormat),
   transports: [
     new transports.Console({
-      format: combine(colorize(), logFormat)
+      format: combine(colorize(), logFormat),
     }),
     new transports.File({ filename: "logs/error.log", level: "error" }),
     new transports.File({ filename: "logs/combined.log" }),

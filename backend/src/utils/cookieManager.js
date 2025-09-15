@@ -2,7 +2,7 @@ const {
   REFRESH_COOKIE_NAME,
   baseCookieOptions,
   REFRESH_COOKIE_MAX_AGE,
-} = require("../config/cookie");
+} = require("../config/core");
 const { verifyRefreshToken } = require("./tokenManager");
 
 const setRefreshToken = (res, token) => {

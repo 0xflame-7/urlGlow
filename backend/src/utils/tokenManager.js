@@ -1,18 +1,26 @@
 const jwt = require("jsonwebtoken");
+const {
+  ACCESS_TOKEN_EXPIRES_IN,
+  JWT_REFRESH_SECRET,
+  JWT_SECRET,
+  REFRESH_TOKEN_EXPIRES_IN,
+} = require("../config/core");
 
 const generateAccessToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
+  return jwt.sign({ userId }, JWT_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  });
 };
 
 const generateRefreshToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: "7d",
+  return jwt.sign({ userId }, JWT_REFRESH_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   });
 };
 
 const verifyAccessToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return null;
   }
@@ -20,7 +28,7 @@ const verifyAccessToken = (token) => {
 
 const verifyRefreshToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    return jwt.verify(token, JWT_REFRESH_SECRET);
   } catch (err) {
     return null;
   }

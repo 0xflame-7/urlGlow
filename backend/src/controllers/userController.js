@@ -1,4 +1,3 @@
-const cookieOptions = require("../config/cookie");
 const userService = require("../services/userService");
 const {
   setRefreshToken,

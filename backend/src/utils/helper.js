@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
+const SALT_ROUNDS = require("../config/core").SALT_ROUNDS;
 
 const hashPasswordForUser = async (password) =>
-  await bcrypt.hash(password, Number(process.env.SALT_ROUNDS) || 10);
+  await bcrypt.hash(password, SALT_ROUNDS);
 
 const comparePasswordWithHash = async (password, hash) =>
   await bcrypt.compare(password, hash);
