@@ -1,33 +1,39 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const {
   BadRequestError,
   ConflictError,
   UnauthorizedError,
 } = require("../middleware/errorHandler");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} = require("../utils/tokenManager");
+const {
+  hashPasswordForUser,
+  comparePasswordWithHash,
+} = require("../utils/helper");
+const {
+  getUserByEmail,
+  createUser,
+  updateRefreshToken,
+  clearRefreshToken,
+  getRefreshTokenById,
+} = require("../repository/userRepository");
 
 async function registerUser({ name, email, password }) {
   if (!name || !email || !password) {
     throw new BadRequestError("All fields are required");
   }
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await getUserByEmail(email);
   if (existingUser) {
     throw new ConflictError("Email already exists");
   }
 
-  const saltRounds = 10;
-  const hashPassword = await bcrypt.hash(password, saltRounds);
-
-  const user = new User({ name, email, hashPassword });
-  await user.save();
+  const hashedPassword = await hashPasswordForUser(password);
+  const user = await createUser({ name, email, hashedPassword });
 
   return user;
-}
-
-async function getUserByEmail(email) {
-  return await User.findOne({ email }).select("+hashPassword");
 }
 
 async function loginUser({ email, password }) {
@@ -40,21 +46,47 @@ async function loginUser({ email, password }) {
     throw new UnauthorizedError("Invalid credentials");
   }
 
-  const isMatch = await bcrypt.compare(password, user.hashPassword);
-  if (!isMatch) {
-    throw new UnauthorizedError("Invalid credentials");
+  const isMatch = await comparePasswordWithHash(password, user.hashedPassword);
+  if (!isMatch) throw new UnauthorizedError("Invalid credentials");
+
+  // create tokens
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+
+  // save refresh token in DB
+  await updateRefreshToken(user._id, refreshToken);
+
+  return { user, accessToken, refreshToken };
+}
+
+async function refreshAccessToken(refreshToken) {
+  if (!refreshToken) throw new UnauthorizedError("No refresh token provided");
+
+  const payload = verifyRefreshToken(refreshToken);
+  const user = await getRefreshTokenById(payload.userId);
+
+  console.group("Refresh Access Token");
+  console.log("User:", user);
+  console.log("Payload:", payload);
+
+  if (!user || user.refreshToken !== refreshToken) {
+    throw new UnauthorizedError("Invalid refresh token");
   }
 
-  // ✅ JWT creation
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const newAccessToken = generateAccessToken(user._id);
+  return { accessToken: newAccessToken };
+}
 
-  return { user, token };
+async function logoutUser(userId) {
+  if (!userId) throw new UnauthorizedError("Not authenticated");
+
+  await clearRefreshToken(userId);
+  return { isAuth: false, message: "Logged out successfully" };
 }
 
 module.exports = {
   registerUser,
-  getUserByEmail,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
 };

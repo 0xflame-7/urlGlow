@@ -28,6 +28,7 @@ services:
       - MONGO_URL=mongodb://mongo:27017/urlGlow
       - JWT_SECRET=super_secret_key
       - JWT_REFRESH_SECRET=super_refresh_secret_key
+      - SALT_ROUNDS=10
     command: pnpm dev
     develop:
       watch:

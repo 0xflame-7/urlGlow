@@ -1,18 +1,21 @@
-const jwt = require("jsonwebtoken");
+const { UnauthorizedError } = require("../middleware/errorHandler");
+const { verifyAccessToken } = require("../utils/tokenManager");
 
 function authMiddleware(req, res, next) {
-  const token = req.cookies.authToken;
-  if (!token) {
-    return res.status(401).json({ isAuth: false, error: "Unauthorized" });
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new UnauthorizedError("No token provided");
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch (err) {
-    return res.status(401).json({ isAuth: false, error: "Invalid token" });
+  const token = authHeader.split(" ")[1];
+  const payload = verifyAccessToken(token);
+
+  if (!payload) {
+    throw new UnauthorizedError("Invalid or expired token");
   }
+
+  req.userId = payload.userId; // attach user info
+  next();
 }
 
 module.exports = authMiddleware;

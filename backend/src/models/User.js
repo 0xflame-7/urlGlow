@@ -13,15 +13,19 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
-  hashPassword: {
+  hashedPassword: {
     type: String,
     required: true,
     select: false,
-    minlength: 6,
   },
   profilePic: {
     type: String,
     default: null,
+  },
+  // store refresh token
+  refreshToken: {
+    type: String,
+    select: false,
   },
 });
 

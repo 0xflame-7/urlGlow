@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const logger = require("./src/config/logger");
 const connect = require("./src/config/connect");
+const cookieParser = require("cookie-parser");
 
 // Create express app
 const app = express();
@@ -17,6 +18,7 @@ app.use(
 
 // middleware for parsing json
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   logger.info("Incoming request to /");
